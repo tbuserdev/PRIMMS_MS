@@ -15,10 +15,6 @@
 
 	const sidebarNavItems = [
 		{
-			title: "Dashboard",
-			href: "/dashboard"
-		},
-		{
 			title: "Kalendertermine einfügen",
 			href: "/calendar"
 		},
@@ -30,12 +26,12 @@
 
 	const formNavItems= [
 		{
-			title: "Formular Jahresarbeitszeit",
-			href: "/error"
+			title: "Jahresarbeitszeit",
+			href: "/jahresarbeitszeit"
 		},
 		{
-			title: "Formular Abwesenheit",
-			href: "/error"
+			title: "Abwesenheit",
+			href: "/abwesenheit"
 		},
 	];
 </script>
@@ -43,7 +39,7 @@
 <ModeWatcher />
 <div class="h-screen">
 	{#if $authStore.auth}
-		<div class="hidden space-y-6 p-10 pb-16 md:block">
+		<div class="space-y-6 p-10 pb-16">
 			<div class="space-y-0.5 flex justify-between">
 				<div>
 					<h2 class="text-2xl font-bold tracking-tight">Primarschule Münchenstein</h2>
@@ -56,9 +52,16 @@
 			</div>
 			<Separator class="my-6" />
 			<div class="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-				<aside class="-mx-4 lg:w-1/5">
-					<SidebarNav items={sidebarNavItems}/>
-					<SidebarNav items={formNavItems} />
+				<aside class="lg:w-1/5 space-y-4">
+					<p class="text-sm text-muted-foreground">Office</p>
+					<div class="-mx-4">
+						<SidebarNav items={sidebarNavItems}/>
+					</div>
+					<Separator/>
+					<p class="text-sm text-muted-foreground">Formulare</p>
+					<div class="-mx-4">
+						<SidebarNav items={formNavItems} />
+					</div>
 				</aside>
 				<div class="flex-1 lg:max-w-2xl">
 					<slot />
