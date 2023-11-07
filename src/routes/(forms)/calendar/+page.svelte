@@ -1,17 +1,9 @@
 <script lang="ts">
 	import { Separator } from "$lib/components/ui/separator";
 	import BirthdayForm from "$lib/components/BirthdayForm.svelte";
-    import { onMount } from "svelte";
 	
 	export let data;
 	let accessToken: string;
-
-	onMount(() => {
-		accessToken = sessionStorage.getItem("msal.token") as string || "";
-		if (!accessToken) {
-			window.location.href = "/";
-		}
-	});
 </script>
 
 <div class="space-y-6">
