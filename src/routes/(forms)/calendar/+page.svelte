@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Separator } from "$lib/components/ui/separator";
 	import BirthdayForm from "$lib/components/BirthdayForm.svelte";
+	import { authStore } from "$lib/authStore";
 	
 	export let data;
-	let accessToken: string;
 </script>
 
 <div class="space-y-6">
@@ -12,5 +12,5 @@
 		<p class="text-sm text-muted-foreground">Hier kannst du automatisch deinen Kalender updaten</p>
 	</div>
 	<Separator />
-	<BirthdayForm form={data.form} accessToken={accessToken} />
+	<BirthdayForm form={data.form} accessToken={$authStore.accessToken} />
 </div>
