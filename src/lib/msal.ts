@@ -6,8 +6,6 @@ const config = {
     auth: {
         clientId: 'e0e48643-a2d9-49cd-a8c5-d3b4e945dcfb',
         authority: 'https://login.microsoftonline.com/d2ed94a9-779e-454b-9532-ff9783a65463',
-        redirectUri: '/',
-        postLogoutRedirectUri: '/'
     },
     cache: {
         cacheLocation: '',
