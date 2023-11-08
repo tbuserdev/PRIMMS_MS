@@ -1,7 +1,9 @@
+<svelte:head>
+	<title>E-Mail Liste</title>
+</svelte:head>
+
 <script lang="ts">
 	import { Separator } from "$lib/components/ui/separator";
-	
-	export let data;
 </script>
 
 <div class="space-y-6">

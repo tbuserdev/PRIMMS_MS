@@ -1,3 +1,7 @@
+<svelte:head>
+	<title>Kalender</title>
+</svelte:head>
+
 <script lang="ts">
 	import { Separator } from "$lib/components/ui/separator";
 	import * as Accordion from "$lib/components/ui/accordion";
