@@ -9,4 +9,5 @@
 
 <div class="h-screen">
 	<slot />
+	<div class="hidden dark">initate dark class</div>
 </div>
