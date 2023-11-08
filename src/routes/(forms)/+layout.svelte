@@ -26,10 +26,6 @@
 
 	const formNavItems= [
 		{
-			title: "Jahresarbeitszeit",
-			href: "/jahresarbeitszeit"
-		},
-		{
 			title: "Abwesenheit",
 			href: "/abwesenheit"
 		},
