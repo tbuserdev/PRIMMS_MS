@@ -7,7 +7,7 @@
 	inject({ mode: dev ? 'development' : 'production' });
 </script>
 
-<div class="h-screen">
+<div class="h-screen-dvh">
 	<slot />
 	<div class="hidden dark">initate dark class</div>
 </div>
