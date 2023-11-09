@@ -3,20 +3,22 @@
 </svelte:head>
 
 <script lang="ts">
+	import { enhance } from '$app/forms';
+	import { page } from '$app/stores';
+
 	import { Separator } from "$lib/components/ui/separator";
 	import { Textarea } from "$lib/components/ui/textarea";
 	import { Button } from "$lib/components/ui/button";
 	import * as Table from "$lib/components/ui/table";
 	import { Input } from "$lib/components/ui/input";
   	import { Label } from "$lib/components/ui/label";
+	import * as Alert from "$lib/components/ui/alert";
 
-	import { Client } from '@microsoft/microsoft-graph-client';
 	import { authStore } from "$lib/authStore";
-    import { get } from "svelte/store";
 
 	let inputstring = "";
 	let contacts: any[] = [];
-	let contactlistname = "";
+	let contactjson = "";
 
 	async function inputToObj() {
 		let contactstring = inputstring.split(/\s{2,}/);
@@ -39,41 +41,36 @@
 
 			contactObj["name"] = name;
 			contactObj["email"] = email;
+
 			return contactObj;
 		});
-	}
-
-	async function addNewContactList() {
-		console.log(get(authStore).accessToken);
-		const client = Client.init({
-			authProvider: (done) => {
-				done(null, get(authStore).accessToken);
-			},
-		});
-
-		if (contactlistname != "") {
-			contactlistname = "Neue Kontaktliste";
-
-			let contactlist = await client.api("/me/contactFolders").post({
-				displayName: contactlistname
-			});
-			console.log("Hallo: ", contactlist);
-		}
+		contactjson = JSON.stringify(contacts);
 	}
 </script>
 
 <div class="space-y-6">
-	<div>
-		<h3 class="text-lg font-medium">Benutzerdefinierte Kontaktgruppen</h3>
-		<p class="text-sm text-muted-foreground">Erstelle Kontaktgruppen mit der du von deinem gewohnten Postfach verschiedene Gruppen kontaktieren kannst. </p>
-	</div>
-	<Separator />
-	{#if contacts.length > 0}
-		<div class="flex flex-col w-full space-y-5">
-			<Label for="contactlistname">Name der neuen Kontaktliste</Label>
-			<Input type="text" id="contactlistname" placeholder="1x 2022/2025" class="w-full" bind:value={contactlistname}/>
-			<Button on:click={addNewContactList}>Neue Kontaktliste erstellen</Button>
+	<div class="space-y-3">
+		<div>
+			<h3 class="text-lg font-medium">Benutzerdefinierte Kontaktgruppen</h3>
+			<p class="text-sm text-muted-foreground">Erstelle Kontaktgruppen mit der du von deinem gewohnten Postfach verschiedene Gruppen kontaktieren kannst - <a class="underline" href="https://scribehow.com/shared/Benutzerdefinierte_Kontaktgruppen_ITPRIMMS__OioZ-rw2RYKeGqCgVv7Bnw">hier zur Anleitung</a>.</p>
 		</div>
+		<Separator />
+		{#if $page.form}
+			<Alert.Root class="mt-4 border-green-500">
+				<Alert.Title class="text-green-500">Kontakterstellung erfolgreich!</Alert.Title>
+				<Alert.Description class="text-green-500">{$page.form.body.message}</Alert.Description>
+			</Alert.Root>
+		{/if}
+	</div>
+
+	{#if contacts.length > 0}
+		<form class="flex flex-col w-full space-y-5"  method="POST" use:enhance>
+			<Label for="contactlistname">Name der neuen Kontaktliste</Label>
+			<Input type="text" id="contactlistname" placeholder="1x 2022/2025" class="w-full" name="contactlistname"/>
+			<input type="text" id="contacts" name="contacts" class="hidden" bind:value={contactjson}>
+			<input type="text" id="accessKey" name="accessKey" class="hidden" bind:value={$authStore.accessToken}>
+			<Button>Neue Kontaktliste erstellen</Button>
+		</form>
 
 		<Table.Root>
 			<Table.Header>
@@ -92,7 +89,7 @@
 			</Table.Body>
 		</Table.Root>
 	{:else}
-		<Textarea bind:value={inputstring} />
+		<Textarea bind:value={inputstring}/>
 		<Button on:click={inputToObj} class="w-full">Kontakte importieren</Button>
 	{/if} 
 </div>

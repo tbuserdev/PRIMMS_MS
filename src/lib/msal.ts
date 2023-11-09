@@ -16,7 +16,7 @@ const config = {
 export async function login() {
     const msalInstance = await PublicClientApplication.createPublicClientApplication(config);
     const loginRequest = {
-        scopes: ['user.read', 'calendars.readwrite']
+        scopes: ['user.read', 'calendars.readwrite', 'contacts.readwrite']
     };
     await msalInstance.loginPopup(loginRequest).then(loginResponse => {
         if (loginResponse.account === null) {
