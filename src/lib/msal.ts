@@ -1,5 +1,5 @@
 import { PublicClientApplication } from "@azure/msal-browser";
-import { authStore } from "$lib/authStore";
+import { authStore, userStore } from "$lib/authStore";
 import { get } from "svelte/store";
 
 const config = {
@@ -29,6 +29,15 @@ export async function login() {
                 homeAccId: loginResponse.account.homeAccountId,
                 accessToken: loginResponse.accessToken,
         });
+            userStore.set({
+                Vorname: "",
+                Nachname: "",
+                Email: loginResponse.account.username,
+                Personalnummer: "",
+                Schulhaus: "",
+                Klasse: "",
+                Schultyp: "",
+            });
         }
     })
 }
@@ -45,6 +54,15 @@ export async function logout() {
             name: "",
             homeAccId: "",
             accessToken: "",
+        });
+        userStore.set({
+            Vorname: "",
+            Nachname: "",
+            Email: "",
+            Personalnummer: "",
+            Schulhaus: "",
+            Klasse: "",
+            Schultyp: "",
         });
     })
 }

@@ -1,6 +1,7 @@
 import { writable } from "svelte/store";
 import { browser } from '$app/environment'
 
+// Local storage store utility
 export const localStore = (key: string, initial: any) => {
     const toString = (value: any) => JSON.stringify(value, null, 2);
     const toObj = (value:any) => JSON.parse(value);
@@ -23,6 +24,7 @@ export const localStore = (key: string, initial: any) => {
     };
 };
 
+// Auth store
 export const authStoreObj = writable({
     auth: false,
     email: "",
@@ -32,3 +34,16 @@ export const authStoreObj = writable({
 });
 
 export const authStore = localStore("auth", authStoreObj);
+
+// User store
+export const userStoreObj = writable({
+    Vorname: "",
+    Nachname: "",
+    Email: "",
+    Personalnummer: "",
+    Schulhaus: "",
+    Klasse: "",
+    Schultyp: "",
+});
+
+export const userStore = localStore("user", userStoreObj);

@@ -30,6 +30,13 @@
 			href: "/abwesenheit"
 		},
 	];
+
+	const Nav = [
+		{
+			title: "Startseite",
+			href: "/start"
+		}
+	]
 </script>
 
 <ModeWatcher />
@@ -38,7 +45,7 @@
 		<div class="space-y-0.5 flex justify-between">
 			<a href="/start">
 				<h2 class="text-2xl font-bold tracking-tight">Primarschule Münchenstein</h2>
-				<p class="text-muted-foreground">Verwalte verschiedene Aspekte deines Accounts und fülle Formulare aus</p>
+				<p class="text-sm text-muted-foreground">beschreibung der Website</p>
 			</a>
 			<div class="flex flex-row space-x-4 align-middle">
 				<DarkModeToggle/>
@@ -48,6 +55,10 @@
 		<Separator class="my-6" />
 		<div class="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
 			<aside class="lg:w-1/5 space-y-4">
+				<div class="-mx-4">
+					<SidebarNav items={Nav}/>
+				</div>
+				<Separator/>
 				<p class="text-sm text-muted-foreground">Office</p>
 				<div class="-mx-4">
 					<SidebarNav items={sidebarNavItems}/>

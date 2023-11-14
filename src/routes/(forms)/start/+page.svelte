@@ -3,21 +3,72 @@
 </svelte:head>
 
 <script lang="ts">
-    import { authStore } from "$lib/authStore";
+    import { authStore, userStore } from "$lib/authStore";
+    import { enhance } from '$app/forms';
+	import { page } from '$app/stores';
+
+    import { Button } from "$lib/components/ui/button";
+    import { Input } from "$lib/components/ui/input";
+    import { Label } from "$lib/components/ui/label";
+    
+    async function updateUserStore(){
+        if ($page.form) {
+            userStore.set({
+                Vorname: $page.form.body.vorname || "",
+                Nachname: $page.form.body.nachname || "",
+                Email: $authStore.email || "",
+                Personalnummer: $page.form.body.personalnummer || "",
+                Schulhaus: $page.form.body.schulhaus || "",
+                Klasse: $page.form.body.klasse || "",
+                Schultyp: $page.form.body.schultyp || ""
+            });
+        } else {
+            userStore.set({
+                Vorname: "",
+                Nachname: "",
+                Email: $authStore.email,
+                Personalnummer: "",
+                Schulhaus: "",
+                Klasse: "",
+                Schultyp: ""
+            });
+        }
+    }
+
+    if ($page.form) {
+        updateUserStore();
+    }
+
+    console.log($page.form);
+    console.log($userStore);
 </script>
 
+<section class="space-y-10">
+    <div class="space-y-1">
+        <h3 class="text-2xl font-semibold tracking-tight">Hallo {$authStore.name}!</h3>
+        <p class="text-sm text-muted-foreground mb-10">Willkommen auf der Startseite des IT-Portals.</p>
+    </div>
 
-<h3 class="text-lg font-medium">Willkommen {$authStore.name} im IT-Portal</h3>
-<p class="text-sm text-muted-foreground mb-10">Auf der linken Seite siehst du die verschiedenen Angebote.</p>
-
-<p class="text-sm text-muted-foreground">
-    Folgende Daten von dir sind verfügbar:
-</p>
-  
-
-<ul class="my-6 ml-6 list-disc [&>li]:mt-2 text-sm text-muted-foreground">
-    <li>Name: {$authStore.name}</li>
-    <li>E-Mail Adresse: {$authStore.email}</li>
-</ul>
-  
-  
+    <div>
+        <h4 class="text-lg font-semibold tracking-tight mb-4">
+            Persönliche Informationen
+        </h4>
+        <form class="flex flex-col w-full space-y-5" method="POST">
+            {#each Object.entries($userStore) as [key, value]}
+                {#if !value}
+                    <div class="sm:flex">
+                        <Label class="text-sm pt-2 sm:w-1/3" for="{key}">{key}</Label>
+                        <Input type="text" id="{key}" name="{key}" placeholder="{key}" bind:value={value} class="border-blue-300"/>
+                    </div>
+                {:else}
+                    <div class="sm:flex">
+                        <Label class="text-sm pt-2 sm:w-1/3" for="{key}">{key}</Label>
+                        <Input type="text" id="{key}" name="{key}" placeholder="{key}" bind:value={value}/>
+                    </div>
+                {/if}
+             {/each}
+            <input type="text" id="accessKey" name="accessKey" class="hidden" bind:value={$authStore.accessToken}>
+            <Button>Persönliche Informationen updaten</Button>
+        </form>
+    </div>
+</section>
