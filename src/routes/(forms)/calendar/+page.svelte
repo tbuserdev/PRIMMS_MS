@@ -9,6 +9,8 @@
 	import { authStore } from "$lib/authStore";
 	
 	export let data;
+
+	// TODO: Error message from server and sucess form submit
 </script>
 
 <div class="space-y-6">

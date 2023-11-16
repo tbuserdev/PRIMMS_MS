@@ -4,7 +4,6 @@
 
 <script lang="ts">
     import { authStore, userStore } from "$lib/authStore";
-    import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 
     import { Button } from "$lib/components/ui/button";
@@ -41,6 +40,9 @@
 
     console.log($page.form);
     console.log($userStore);
+
+    // TODO: Implement download of csv file
+    // TODO: OneDrive Connection
 </script>
 
 <section class="space-y-10">

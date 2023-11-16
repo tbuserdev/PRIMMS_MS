@@ -39,6 +39,8 @@
     {#if hour > 0}
         <p class="text-sm text-muted-foreground">Zugang aktiv für {hour} Stunden, {minute} Minuten</p>
     {:else if minute > 0}
+        <p class="text-sm text-muted-foreground">Zugang aktiv für {minute} Minuten</p>
+    {:else if minute < 5}
         <p class="text-sm text-muted-foreground">Zugang aktiv für {minute} Minuten, {second} Sekunden</p>
     {:else}
         <p class="text-sm text-muted-foreground">Zugang aktiv für {second} Sekunden</p>
