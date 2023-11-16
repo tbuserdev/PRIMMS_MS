@@ -46,6 +46,8 @@
 		});
 		contactjson = JSON.stringify(contacts);
 	}
+
+	$: console.log($page.form);
 </script>
 
 <div class="space-y-6">
@@ -61,6 +63,7 @@
 				<Alert.Description class="text-green-500">{$page.form.body.message}</Alert.Description>
 			</Alert.Root>
 		{/if}
+		
 	</div>
 
 	{#if contacts.length > 0}

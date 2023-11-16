@@ -1,60 +1,61 @@
 import { PublicClientApplication } from "@azure/msal-browser";
 import { authStore, userStore } from "$lib/authStore";
-import { get } from "svelte/store";
 
-const config = {
+const msalInstance = new PublicClientApplication({
     auth: {
         clientId: 'e0e48643-a2d9-49cd-a8c5-d3b4e945dcfb',
-        authority: 'https://login.microsoftonline.com/d2ed94a9-779e-454b-9532-ff9783a65463',
-    },
-    cache: {
-        cacheLocation: '',
-        storeAuthStateInCookie: false
+        authority: 'https://login.microsoftonline.com/d2ed94a9-779e-454b-9532-ff9783a65463'
     }
-};
+});
 
 export async function login() {
-    const msalInstance = await PublicClientApplication.createPublicClientApplication(config);
-    const loginRequest = {
+    await msalInstance.initialize();
+    await msalInstance.loginPopup({
         scopes: ['user.read', 'calendars.readwrite', 'contacts.readwrite']
-    };
-    await msalInstance.loginPopup(loginRequest).then(loginResponse => {
-        if (loginResponse.account === null) {
+    }).then((response) => {
+        if (response.account === null) {
             return;
-        } else {
-            authStore.set({
-                auth: true,
-                email: loginResponse.account.username,
-                name: loginResponse.account.name,
-                homeAccId: loginResponse.account.homeAccountId,
-                accessToken: loginResponse.accessToken,
-        });
-            userStore.set({
-                Vorname: "",
-                Nachname: "",
-                Email: loginResponse.account.username,
-                Personalnummer: "",
-                Schulhaus: "",
-                Klasse: "",
-                Schultyp: "",
-            });
         }
-    })
+    
+        authStore.set({
+            auth: true,
+            email: response.account.username,
+            name: response.account.name,
+            homeAccId: response.account.homeAccountId,
+            accessToken: response.accessToken,
+            expiresOn: response.expiresOn,
+        });
+
+        userStore.set({
+            Vorname: "",
+            Nachname: "",
+            Email: response.account.username,
+            Personalnummer: "",
+            Schulhaus: "",
+            Klasse: "",
+            Schultyp: "",
+        });
+
+    }).catch((error) => {
+        console.log(error);
+    });
 }
+   
 
 export async function logout() {
-    const msalInstance = await PublicClientApplication.createPublicClientApplication(config);
-    const logoutRequest = {
-        account: msalInstance.getAccountByHomeId(get(authStore).homeAccId)
-    };
-    await msalInstance.logoutPopup(logoutRequest).then(() => {
+    await msalInstance.initialize();
+    await msalInstance.logoutPopup({
+        account: msalInstance.getActiveAccount()
+    }).then(() => {
         authStore.set({
             auth: false,
             email: "",
             name: "",
             homeAccId: "",
             accessToken: "",
+            expiresOn: "",
         });
+
         userStore.set({
             Vorname: "",
             Nachname: "",
@@ -64,5 +65,5 @@ export async function logout() {
             Klasse: "",
             Schultyp: "",
         });
-    })
+    });
 }

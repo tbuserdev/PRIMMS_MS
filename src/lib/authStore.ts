@@ -31,6 +31,7 @@ export const authStoreObj = writable({
     name: "",
     homeAccId: "",
     accessToken: "",
+    expiresOn: "",
 });
 
 export const authStore = localStore("auth", authStoreObj);

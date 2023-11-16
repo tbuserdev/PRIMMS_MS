@@ -10,8 +10,7 @@
 	import DarkModeToggle from "$lib/components/DarkModeToggle.svelte";
     import Button from "$lib/components/ui/button/button.svelte";
 	import AuthForm from "$lib/components/AuthForm.svelte";
-
-	// TODO: Add Avatar with name and email, account Information, etc.
+	import TokenExpired from '$lib/components/TokenExpired.svelte';
 
 	const sidebarNavItems = [
 		{
@@ -45,7 +44,7 @@
 		<div class="space-y-0.5 flex justify-between">
 			<a href="/start">
 				<h2 class="text-2xl font-bold tracking-tight">Primarschule Münchenstein</h2>
-				<p class="text-sm text-muted-foreground">beschreibung der Website</p>
+				<TokenExpired />
 			</a>
 			<div class="flex flex-row space-x-4 align-middle">
 				<DarkModeToggle/>
