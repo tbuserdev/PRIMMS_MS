@@ -47,6 +47,8 @@
 		contactjson = JSON.stringify(contacts);
 	}
 	$: console.log($page.form);
+
+	// TODO: Add error message from FORM
 </script>
 
 <div class="space-y-6">
@@ -62,7 +64,6 @@
 				<Alert.Description class="text-green-500">{$page.form.body.message}</Alert.Description>
 			</Alert.Root>
 		{/if}
-		// TODO: Add error message from FORM
 	</div>
 
 	{#if contacts.length > 0}
