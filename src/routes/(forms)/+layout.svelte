@@ -41,6 +41,8 @@
 <ModeWatcher />
 {#if $authStore.auth}
 	<div class="space-y-6 p-10 pb-16">
+
+		<!-- NAVBAR -->
 		<div class="space-y-0.5 flex justify-between">
 			<a href="/start">
 				<h2 class="text-2xl font-bold tracking-tight">Primarschule Münchenstein</h2>
@@ -52,7 +54,9 @@
 			</div>
 		</div>
 		<Separator class="my-6" />
+		
 		<div class="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+			<!-- SIDEBAR -->
 			<aside class="lg:w-1/5 space-y-4">
 				<div class="-mx-4">
 					<SidebarNav items={Nav}/>
@@ -68,6 +72,8 @@
 					<SidebarNav items={formNavItems} />
 				</div>
 			</aside>
+
+			<!-- CONTENT -->
 			<div class="flex-1 lg:max-w-2xl">
 				<slot />
 			</div>
