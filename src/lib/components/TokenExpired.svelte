@@ -33,7 +33,7 @@
     });
 </script>
 
-{#if timeLeftCount == 0}
+{#if timeLeftCount == 0 || $authStore.accessToken == null || $authStore.accessToken == "" || timeLeftCount < 0}
     <button class="text-sm text-muted-foreground text-red-500 text-left" on:click={logout}>Zugang abgelaufen am {datum}, um {uhrzeit}. <br>Bitte hier klicken um den Zugang zu erneuern (ausloggen).</button>
 {:else}
     {#if hour > 0}
