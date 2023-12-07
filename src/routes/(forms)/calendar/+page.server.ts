@@ -1,48 +1,83 @@
-import { superValidate } from "sveltekit-superforms/server";
-import { fail } from "@sveltejs/kit";
-import { birthdayformSchema } from "$lib/schema";
-import Papa from 'papaparse';
 import { Client } from '@microsoft/microsoft-graph-client';
-import { getEvents, deleteEvent, addEvents } from '$lib/msgraph_calendar';
 
-function csvToJS(csv: string) {
-    const parsed_csv = Papa.parse(csv, { header: true });
+const accessKeyErrorMessage = 'Der Zugangsschlüssel ist ungültig. Bitte neu einloggen um fortzufahren (siehe Fehlermeldung oben).';
 
-    const headers = parsed_csv.meta.fields;
-    if (headers != null) {
-        const required = ['Vorname', 'Name', 'Geb'];
-        const missing = required.filter(r => !headers.includes(r));
-        if (missing.length > 0) {
-            return null;
-        } else {
-            return parsed_csv.data;
-        }
-    } else {
-        return null;
+// INTERNAL FUNCTIONS
+async function getEvents(client: Client) {
+    let result = await client.api('/me/events').get();
+    let events = result.value;
+    while (result['@odata.nextLink']) {
+        result = await client.api(result['@odata.nextLink']).get();
+        events = events.concat(result.value);
     }
+    return events
 }
 
-export const load = () => {
-    return {
-        form: superValidate(birthdayformSchema),
-        eventsbefore: [],
-        eventsafter: []
-    };
-};
+async function deleteEvent(client: Client) {
+    let events = await getEvents(client);
+    let eventsbefore = events.map((events: any) => events.subject);
+    let requests = [];
+    for (let event of events) {
+        requests.push({
+            id: event.id,
+            method: 'DELETE',
+            url: `/me/events/${event.id}`
+        });
+        if (requests.length === 20) {
+            await client.api('$batch').post({ requests });
+            requests = [];
+        }
+    }
+    if (requests.length > 0) {
+        await client.api('$batch').post({ requests });
+    }
+    return eventsbefore;
+}
 
+// SVELTEKIT ACTIONS
 export const actions = {
-    default: async (event) => {
+    delete: async ({ request }) => {
         try {
-            const form = await superValidate(event, birthdayformSchema);
+            console.log("- - DELETE ACTION STARTED - -");
+            const data = await request.formData();
+            const accessKey = data.get('accessKeyDelete')?.toString();
 
-            if (!form.valid) {
-                return fail(400, form);
+            if (accessKey == null) {
+                return { success: false, error: accessKeyErrorMessage };
             }
+            
+            const client = Client.init({
+                authProvider: async (done) => {
+                    done(null, accessKey);
+                }
+            });
 
-            const csv = form.data.content;
-            const year = form.data.year;
-            const accessKey = form.data.accessKey;
-            const data = csvToJS(csv.toString());
+            await deleteEvent(client);
+            console.log("- - DELETE ACTION ENDED - -");
+            return { success: true, message: 'Alle Kalendereinträge wurden erfolgreich gelöscht.'};
+        } catch (error: any) {
+            const errorMessage = JSON.parse(error.body);
+            if (errorMessage.code == "InvalidAuthenticationToken") {
+                return { success: false, error: JSON.stringify(error), message: accessKeyErrorMessage };
+            }
+            return { success: false, error: JSON.stringify(error), message: errorMessage.message };
+        }
+    },
+
+    create: async ({ request }) => {
+        try {
+            console.log("- - CREATE ACTION STARTED - -");
+            const data = await request.formData();
+            const accessKey = data.get('accessKeyCreate')?.toString();
+            let csv = data.get('eventArray')?.toString();
+            
+
+            let length = 0;
+
+            // ACCESS KEY
+            if (accessKey == null || accessKey == "") {
+                return { success: false, error: accessKeyErrorMessage, message: accessKeyErrorMessage };
+            } 
 
             const client = Client.init({
                 authProvider: async (done) => {
@@ -50,22 +85,64 @@ export const actions = {
                 }
             });
 
-            const eventsbefore = await deleteEvent(client);
-            await addEvents(client, data, year);
-            const events = await getEvents(client);
-            const eventsafter = events.map((event: any) => event.subject);
+            // CSV
+            if (csv == null || csv == "" || csv == undefined) {
+                return { success: false,  error: "Keine Daten übergeben.", message: "Keine Daten übergeben.", };
+            } else {
+                csv = csv.replace(/&quot;/g, '"')
+                const csvobj = JSON.parse(csv);
+                length = csvobj.length;
+                const year = new Date(csvobj[0].start.dateTime).getFullYear();
 
-            console.log("Events before: ", eventsbefore);
-            console.log("Events after: ", eventsafter);
+                let requests = [];
+                let requestid = 0;
 
-            return {
-                form: form,
-                eventsbefore: eventsbefore,
-                eventsafter: eventsafter
-            };
-        } catch (error) {
+                for (const row of csvobj) {
+                    const eventname: string = row.summary.toString();
+                    const eventtimezone: string = row.start.timeZone.toString();
+                    const eventstartdate: string = new Date(row.start.dateTime).toLocaleString('en-US', { timeZone: 'Europe/Berlin' });
+                    const eventenddate: string = new Date(row.end.dateTime).toLocaleString('en-US', { timeZone: 'Europe/Berlin' });
+
+                    requests.push({
+                        id: requestid.toString(),
+                        method: 'POST',
+                        url: `/me/calendar/events`,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: {
+                            subject: eventname,
+                            start: {
+                                dateTime: eventstartdate,
+                                timeZone: eventtimezone,
+                            },
+                            end: {
+                                dateTime: eventenddate,
+                                timeZone: eventtimezone,
+                            },
+                            isAllDay: true,
+                            isReminderOn: false,
+                            showAs: 'free',
+                        },
+                    });
+
+                    requestid = requestid + 1;
+                    if (requests.length === 20) {
+                        await client.api('$batch').post({ requests });
+                        requests = [];
+                    }
+                };
+
+                if (requests.length > 0) {
+                    await client.api('$batch').post({ requests });
+                    console.log("- - CREATE ACTION ENDED - -");
+                    return { success: true, message:  length + ' Kalendereinträge wurden erfolgreich in das Jahr ' + year + ' eingefügt.' };
+                }
+                return { success: false, message:  'Some error in the application occured!' };
+            }
+        } catch (error: any) {
             console.log(error);
-            return fail(500, error as Record<string, unknown>);
+            return { success: false, error: JSON.stringify(error), message: "Unbekannter Fehler"  };
         }
     }
 };
