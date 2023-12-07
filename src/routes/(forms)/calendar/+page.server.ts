@@ -128,7 +128,13 @@ export const actions = {
 
                     requestid = requestid + 1;
                     if (requests.length === 20) {
-                        await client.api('$batch').post({ requests }).then((response) => {console.log(response)}).catch((error: any) => {console.log(error);});
+                        await client.api('$batch').post({ requests }).then((response: any) => {
+                            for (const result of response.responses) {
+                                if (result.status !== 201) {
+                                    console.log(result.body);
+                                }
+                            }
+                        }).catch((error: any) => {console.log(error);});
                         requests = [];
                     }
                 };
