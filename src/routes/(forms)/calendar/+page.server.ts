@@ -99,8 +99,8 @@ export const actions = {
 
                 for (const row of csvobj) {
                     const eventname: string = row.summary.toString();
-                    const eventtimezone: string = row.start.timeZone.toString();
                     const eventstartdate: string = new Date(row.start.dateTime).toLocaleString('en-US', { timeZone: 'Europe/Berlin' });
+                    console.log(eventstartdate);
                     const eventenddate: string = new Date(row.end.dateTime).toLocaleString('en-US', { timeZone: 'Europe/Berlin' });
 
                     requests.push({
@@ -114,11 +114,11 @@ export const actions = {
                             subject: eventname,
                             start: {
                                 dateTime: eventstartdate,
-                                timeZone: eventtimezone,
+                                timeZone: 'Europe/Berlin',
                             },
                             end: {
                                 dateTime: eventenddate,
-                                timeZone: eventtimezone,
+                                timeZone: 'Europe/Berlin',
                             },
                             isAllDay: true,
                             isReminderOn: false,
