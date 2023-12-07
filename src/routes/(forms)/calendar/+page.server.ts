@@ -100,16 +100,10 @@ export const actions = {
                 for (const row of csvobj) {
                     const eventname: string = row.summary.toString();
 
-                    let startdate = new Date(row.start.dateTime);
-                    startdate.setFullYear(year);
-                    startdate.setHours(0,0,0,0);
-                    const eventstartdate: string = startdate.toLocaleString("en-US", {timeZone: "Europe/Berlin"});
-                    console.log(eventstartdate);
-
-                    let enddate = new Date(row.end.dateTime);
-                    enddate.setFullYear(year);
-                    enddate.setHours(0,0,0,0);
-                    const eventenddate: string = enddate.toLocaleString("en-US", {timeZone: "Europe/Berlin"});
+                    let startdate = new Date(row.start.dateTime).toISOString();
+                    startdate = startdate.slice(0, -13) + '00:00:00.000Z';
+                    let enddate = new Date(row.end.dateTime).toISOString();
+                    enddate = enddate.slice(0, -13) + '00:00:00.000Z';
 
                     requests.push({
                         id: requestid.toString(),
@@ -121,11 +115,11 @@ export const actions = {
                         body: {
                             subject: eventname,
                             start: {
-                                dateTime: eventstartdate,
+                                dateTime: startdate,
                                 timeZone: 'Europe/Berlin',
                             },
                             end: {
-                                dateTime: eventenddate,
+                                dateTime: enddate,
                                 timeZone: 'Europe/Berlin',
                             },
                             isAllDay: true,
