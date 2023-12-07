@@ -129,7 +129,7 @@
 		showmessage = true;
 		setTimeout(() => {
 			showmessage = false;
-		}, 7500);
+		}, 10000);
 	}
 
 	$: csvData, updateDates();

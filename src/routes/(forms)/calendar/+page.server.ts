@@ -66,6 +66,7 @@ export const actions = {
 
     create: async ({ request }) => {
         try {
+            console.time();
             console.log("- - CREATE ACTION STARTED - -");
             const data = await request.formData();
             const accessKey = data.get('accessKeyCreate')?.toString();
@@ -100,10 +101,15 @@ export const actions = {
                 for (const row of csvobj) {
                     const eventname: string = row.summary.toString();
 
-                    let startdate = new Date(row.start.dateTime).toISOString();
-                    startdate = startdate.slice(0, -13) + '00:00:00.000Z';
-                    let enddate = new Date(row.end.dateTime).toISOString();
-                    enddate = enddate.slice(0, -13) + '00:00:00.000Z';
+                    let startdate: Date = new Date(row.start.dateTime);
+                    startdate.setDate(startdate.getDate() + 1);
+                    let start: string = startdate.toISOString();
+                    start = start.slice(0, -13) + '00:00:00.000Z';
+
+                    let enddate: Date = new Date(row.end.dateTime );
+                    enddate.setDate(enddate.getDate() + 1);
+                    let end: string = enddate.toISOString();
+                    end = end.slice(0, -13) + '00:00:00.000Z';
 
                     requests.push({
                         id: requestid.toString(),
@@ -115,11 +121,11 @@ export const actions = {
                         body: {
                             subject: eventname,
                             start: {
-                                dateTime: startdate,
+                                dateTime: start,
                                 timeZone: 'Europe/Berlin',
                             },
                             end: {
-                                dateTime: enddate,
+                                dateTime: end,
                                 timeZone: 'Europe/Berlin',
                             },
                             isAllDay: true,
@@ -130,13 +136,7 @@ export const actions = {
 
                     requestid = requestid + 1;
                     if (requests.length === 20) {
-                        await client.api('$batch').post({ requests }).then((response: any) => {
-                            for (const result of response.responses) {
-                                if (result.status !== 201) {
-                                    console.log(result.body);
-                                }
-                            }
-                        }).catch((error: any) => {console.log(error);});
+                        await client.api('$batch').post({ requests }).catch((error: any) => {console.log(error);});
                         requests = [];
                     }
                 };
@@ -144,6 +144,7 @@ export const actions = {
                 if (requests.length > 0) {
                     await client.api('$batch').post({ requests }).catch((error: any) => {console.log(error);});
                     console.log("- - CREATE ACTION ENDED - -");
+                    console.timeEnd();
                     return { success: true, message:  length + ' Kalendereinträge wurden erfolgreich in das Jahr ' + year + ' eingefügt.' };
                 }
                 return { success: false, message:  'Some error in the application occured!' };
