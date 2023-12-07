@@ -159,7 +159,7 @@
 			{:else}
 				<Alert.Root class="mt-4 border-blue-500">
 					<Alert.Title class="text-blue-500">Ausführung gestartet...</Alert.Title>
-					<Alert.Description class="text-blue-500">Bitte einen Moment warten...</Alert.Description>
+					<Alert.Description class="text-blue-500">Bitte kurz warten. Wenn keine Bestätigung kommt, bitte den Vorgang wiederholen, um Serverprobleme zu vermeiden.</Alert.Description>
 				</Alert.Root>
 			{/if}
 		</div>
