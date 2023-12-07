@@ -103,15 +103,13 @@ export const actions = {
                     let startdate = new Date(row.start.dateTime);
                     startdate.setFullYear(year);
                     startdate.setHours(0,0,0,0);
+                    const eventstartdate: string = startdate.toLocaleString("en-US", {timeZone: "Europe/Berlin"});
+                    console.log(eventstartdate);
 
                     let enddate = new Date(row.end.dateTime);
                     enddate.setFullYear(year);
                     enddate.setHours(0,0,0,0);
-
-                    const eventstartdate: string = startdate.toLocaleString('en-US', { timeZone: 'Europe/Berlin' });
-                    const eventenddate: string = enddate.toLocaleString('en-US', { timeZone: 'Europe/Berlin' });
-
-                    console.log(eventstartdate);
+                    const eventenddate: string = enddate.toLocaleString("en-US", {timeZone: "Europe/Berlin"});
 
                     requests.push({
                         id: requestid.toString(),
