@@ -4,10 +4,10 @@ const accessKeyErrorMessage = 'Der Zugangsschlüssel ist ungültig. Bitte neu ei
 
 // INTERNAL FUNCTIONS
 async function getEvents(client: Client) {
-    let result = await client.api('/me/events').get();
+    let result = await client.api('/me/events').get().catch((error: any) => {console.log(error);});
     let events = result.value;
     while (result['@odata.nextLink']) {
-        result = await client.api(result['@odata.nextLink']).get();
+        result = await client.api(result['@odata.nextLink']).get().catch((error: any) => {console.log(error);});
         events = events.concat(result.value);
     }
     return events
@@ -24,12 +24,12 @@ async function deleteEvent(client: Client) {
             url: `/me/events/${event.id}`
         });
         if (requests.length === 20) {
-            await client.api('$batch').post({ requests });
+            await client.api('$batch').post({ requests }).catch((error: any) => {console.log(error);})
             requests = [];
         }
     }
     if (requests.length > 0) {
-        await client.api('$batch').post({ requests });
+        await client.api('$batch').post({ requests }).catch((error: any) => {console.log(error);})
     }
     return eventsbefore;
 }
@@ -128,13 +128,13 @@ export const actions = {
 
                     requestid = requestid + 1;
                     if (requests.length === 20) {
-                        await client.api('$batch').post({ requests });
+                        await client.api('$batch').post({ requests }).catch((error: any) => {console.log(error);});
                         requests = [];
                     }
                 };
 
                 if (requests.length > 0) {
-                    await client.api('$batch').post({ requests });
+                    await client.api('$batch').post({ requests }).catch((error: any) => {console.log(error);});
                     console.log("- - CREATE ACTION ENDED - -");
                     return { success: true, message:  length + ' Kalendereinträge wurden erfolgreich in das Jahr ' + year + ' eingefügt.' };
                 }
